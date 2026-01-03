@@ -6,23 +6,44 @@
 
 現在SQLiteを使用していますが、Vercelでは**PostgreSQL**が必要です。
 
-#### オプションA: Vercel Postgres（推奨・簡単）
+#### オプションA: Supabase（推奨・無料プランあり・簡単）
+
+1. [Supabase](https://supabase.com/)にアクセス
+2. 「Start your project」をクリックしてGitHubアカウントでログイン
+3. 「New Project」をクリック
+4. プロジェクト情報を入力：
+   - **Name**: プロジェクト名（例: `sns-decision-making`）
+   - **Database Password**: 強力なパスワードを設定（後で必要）
+   - **Region**: 最寄りのリージョンを選択（例: `Northeast Asia (Tokyo)`）
+5. 「Create new project」をクリック（数分かかります）
+6. プロジェクトが作成されたら、左メニューから「Settings」→「Database」を選択
+7. 「Connection string」セクションで「URI」をコピー
+   - 形式: `postgresql://postgres:[YOUR-PASSWORD]@db.xxxxx.supabase.co:5432/postgres`
+   - `[YOUR-PASSWORD]`を設定したパスワードに置き換えて使用
+
+**注意**: 接続文字列のパスワード部分を実際のパスワードに置き換える必要があります。
+
+#### オプションB: Neon（無料プランあり）
+
+1. [Neon](https://neon.tech/)にアクセス
+2. 「Sign Up」をクリックしてGitHubアカウントでログイン
+3. 「Create a project」をクリック
+4. プロジェクト情報を入力：
+   - **Name**: プロジェクト名（例: `sns-decision-making`）
+   - **Region**: 最寄りのリージョンを選択
+   - **PostgreSQL version**: 最新版を選択
+5. 「Create project」をクリック
+6. プロジェクトが作成されたら、接続文字列が表示されます
+   - 「Connection string」をコピー
+   - 形式: `postgresql://user:password@host/database?sslmode=require`
+
+#### オプションC: Vercel Postgres（利用可能な場合）
+
+VercelのStorageタブに「Postgres」が表示される場合：
 
 1. Vercelでプロジェクトを作成後、**Storage**タブから**Postgres**を追加
 2. データベース名を入力して作成
-3. `.env.local`に`DATABASE_URL`が自動的に追加されます
-
-#### オプションB: Supabase（無料プランあり）
-
-1. [Supabase](https://supabase.com/)でアカウント作成
-2. 新しいプロジェクトを作成
-3. Settings → Database → Connection string から接続文字列を取得
-
-#### オプションC: Neon（無料プランあり）
-
-1. [Neon](https://neon.tech/)でアカウント作成
-2. 新しいプロジェクトを作成
-3. 接続文字列を取得
+3. 環境変数に`DATABASE_URL`が自動的に追加されます
 
 ### 2. Prismaスキーマの更新
 
@@ -75,11 +96,18 @@ npx prisma generate
 #### 必須環境変数
 
 ```
-DATABASE_URL=postgresql://user:password@host:port/database?schema=public
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.xxxxx.supabase.co:5432/postgres
 NEXTAUTH_SECRET=<ランダムな文字列>
 NEXTAUTH_URL=https://your-app.vercel.app
 GEMINI_API_KEY=AIza...
 ```
+
+**DATABASE_URLの例（Supabase使用時）:**
+```
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.abcdefghijklmnop.supabase.co:5432/postgres
+```
+- `[YOUR-PASSWORD]`をSupabaseで設定したパスワードに置き換えてください
+- Supabaseの接続文字列は、Settings → Database → Connection string → URI から取得できます
 
 #### メール送信用（パスワードリセット機能）
 
