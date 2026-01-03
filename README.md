@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SNS投稿 意思決定ツール
 
-## Getting Started
+AIがあなたのSNS投稿を定性・定量分析し、次回投稿の改善案を提供、投稿に必要な意思決定をサポートします。
 
-First, run the development server:
+## 機能
+
+- **投稿前・投稿後の分析**: 投稿前の意思決定支援と投稿後のパフォーマンス分析
+- **定性・定量分析**: AIによる詳細な分析と改善提案
+- **意思決定支援**: GO/HOLD/NO-GO判定とブランドセーフティ評価
+- **分析履歴**: 過去の分析結果の閲覧とPDFエクスポート
+- **画像・動画対応**: 投稿に添付された画像や動画の分析
+
+## 技術スタック
+
+- **フレームワーク**: Next.js 16.1.1
+- **言語**: TypeScript
+- **認証**: NextAuth.js
+- **データベース**: Prisma (SQLite / PostgreSQL)
+- **AI**: Google Gemini API
+- **スタイリング**: Tailwind CSS
+
+## セットアップ
+
+### 必要な環境変数
+
+`.env.local`ファイルを作成し、以下の環境変数を設定してください：
+
+```env
+# データベース
+DATABASE_URL="file:./dev.db"  # 開発環境（SQLite）
+# または
+# DATABASE_URL="postgresql://..."  # 本番環境（PostgreSQL）
+
+# NextAuth
+NEXTAUTH_SECRET="your-secret-key"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Google Gemini API
+GEMINI_API_KEY="your-gemini-api-key"
+
+# メール送信（パスワードリセット機能）
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_USER="your-email@gmail.com"
+SMTP_PASSWORD="your-app-password"
+SMTP_FROM="your-email@gmail.com"
+```
+
+### インストール
+
+```bash
+npm install
+```
+
+### データベースのセットアップ
+
+```bash
+# マイグレーション実行
+npx prisma migrate dev
+
+# Prisma Clientの生成
+npx prisma generate
+```
+
+### 開発サーバーの起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## デプロイ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+詳細なデプロイ手順は [DEPLOYMENT.md](./DEPLOYMENT.md) を参照してください。
 
-## Learn More
+### クイックスタート（Vercel）
 
-To learn more about Next.js, take a look at the following resources:
+1. GitHubにリポジトリをプッシュ
+2. [Vercel](https://vercel.com/)でプロジェクトをインポート
+3. 環境変数を設定
+4. データベースをPostgreSQLに移行
+5. デプロイ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## スクリプト
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` - 開発サーバーを起動
+- `npm run build` - 本番用ビルド
+- `npm run start` - 本番サーバーを起動
+- `npm run lint` - ESLintでコードをチェック
+- `npm run db:migrate` - データベースマイグレーション（本番環境）
+- `npm run db:push` - データベーススキーマをプッシュ（開発環境）
 
-## Deploy on Vercel
+## ライセンス
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+このプロジェクトはプライベートプロジェクトです。

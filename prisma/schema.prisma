@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String?
+  password          String
+  subscriptionPlan  String      @default("free") // "free" or "premium"
+  subscriptionExpiresAt DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  analyses          Analysis[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model Analysis {
+  id                String      @id @default(cuid())
+  userId            String
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform          String?
+  platformType      String?
+  postText          String
+  imageBase64       String?
+  imageMimeType     String?
+  videoBase64       String?
+  videoMimeType     String?
+  impressions       Int?
+  reach             Int?
+  likes             Int?
+  comments          Int?
+  shares            Int?
+  saves             Int?
+  engagementRate    Float?
+  result            String // JSON string of AnalyzePostResult
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
