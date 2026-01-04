@@ -5,6 +5,8 @@ if (process.env.NODE_ENV === 'production') {
   console.log('Running database migrations...');
   try {
     execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+    console.log('Regenerating Prisma Client after migration...');
+    execSync('npx prisma generate', { stdio: 'inherit' });
   } catch (error) {
     console.error('Migration failed:', error);
     process.exit(1);
