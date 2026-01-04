@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { requestPasswordReset } from "@/app/api/auth/forgot-password/route";
+import { requestPasswordReset } from "@/app/actions";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {

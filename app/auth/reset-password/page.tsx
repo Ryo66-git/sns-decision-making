@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { resetPassword } from "@/app/api/auth/reset-password/route";
+import { resetPassword } from "@/app/actions";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {

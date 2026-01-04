@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { registerUser } from "@/app/api/auth/register/route";
+import { registerUser } from "@/app/actions";
 import Link from "next/link";
 
 export default function SignUpPage() {
