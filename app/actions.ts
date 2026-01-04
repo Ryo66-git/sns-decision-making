@@ -620,7 +620,7 @@ export async function requestPasswordReset(formData: FormData) {
 export async function registerUser(formData: FormData) {
   const { prisma } = await import("@/lib/prisma");
   const { sendWelcomeEmail } = await import("@/lib/email");
-  const bcrypt = await import("bcryptjs");
+  const bcrypt = (await import("bcryptjs")).default;
   const { redirect } = await import("next/navigation");
   
   const email = formData.get("email") as string;
@@ -639,7 +639,7 @@ export async function registerUser(formData: FormData) {
     return { error: "このメールアドレスは既に登録されています" };
   }
 
-  const hashedPassword = await bcrypt.default.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
     data: {
@@ -663,7 +663,7 @@ export async function registerUser(formData: FormData) {
 // パスワードリセット
 export async function resetPassword(formData: FormData) {
   const { prisma } = await import("@/lib/prisma");
-  const bcrypt = await import("bcryptjs");
+  const bcrypt = (await import("bcryptjs")).default;
   const { redirect } = await import("next/navigation");
   
   const token = formData.get("token") as string;
@@ -700,7 +700,7 @@ export async function resetPassword(formData: FormData) {
   }
 
   // パスワードを更新
-  const hashedPassword = await bcrypt.default.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.update({
     where: { id: resetToken.userId },
