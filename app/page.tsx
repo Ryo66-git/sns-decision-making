@@ -9,7 +9,7 @@ import {
   AnalyzePostResult,
   PostAnalysisInput,
 } from "./actions";
-import { saveAnalysis } from "./api/analysis/save/route";
+import { saveAnalysis } from "./actions";
 
 export default function Home() {
   const { data: session, status } = useSession();
