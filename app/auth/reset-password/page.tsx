@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { resetPassword } from "@/app/actions";
 import Link from "next/link";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +131,22 @@ export default function ResetPasswordPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen dashboard-bg flex items-center justify-center p-4">
+        <div className="glass-card-strong rounded-lg p-8 w-full max-w-md">
+          <h1 className="luxury-title text-2xl text-white mb-2 text-center">
+            読み込み中...
+          </h1>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
 
