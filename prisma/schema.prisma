@@ -21,6 +21,8 @@ model User {
   updatedAt         DateTime    @updatedAt
   analyses          Analysis[]
   passwordResetTokens PasswordResetToken[]
+
+  @@map("user")
 }
 
 model Analysis {
@@ -47,6 +49,7 @@ model Analysis {
 
   @@index([userId])
   @@index([createdAt])
+  @@map("analysis")
 }
 
 model PasswordResetToken {
@@ -60,5 +63,6 @@ model PasswordResetToken {
   @@index([token])
   @@index([userId])
   @@index([expiresAt])
+  @@map("password_reset_token")
 }
 
