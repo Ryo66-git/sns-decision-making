@@ -1,24 +1,16 @@
--- Rename existing tables if they exist (with different casing) to lowercase
-DO $$ 
-BEGIN
-    -- Rename User to user if it exists
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'User') THEN
-        ALTER TABLE "User" RENAME TO "user";
-    END IF;
-    
-    -- Rename Analysis to analysis if it exists
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'Analysis') THEN
-        ALTER TABLE "Analysis" RENAME TO "analysis";
-    END IF;
-    
-    -- Rename PasswordResetToken to password_reset_token if it exists
-    IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'PasswordResetToken') THEN
-        ALTER TABLE "PasswordResetToken" RENAME TO "password_reset_token";
-    END IF;
-END $$;
+-- Drop existing tables with incorrect casing (if they exist)
+-- This is safe for new deployments or when data can be reset
+DROP TABLE IF EXISTS "User" CASCADE;
+DROP TABLE IF EXISTS "Analysis" CASCADE;
+DROP TABLE IF EXISTS "PasswordResetToken" CASCADE;
 
--- CreateTable (PostgreSQL compatible) - only if it doesn't exist
-CREATE TABLE IF NOT EXISTS "user" (
+-- Also drop lowercase versions if they exist (to ensure clean state)
+DROP TABLE IF EXISTS "user" CASCADE;
+DROP TABLE IF EXISTS "analysis" CASCADE;
+DROP TABLE IF EXISTS "password_reset_token" CASCADE;
+
+-- CreateTable (PostgreSQL compatible)
+CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
@@ -31,8 +23,8 @@ CREATE TABLE IF NOT EXISTS "user" (
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable - only if it doesn't exist
-CREATE TABLE IF NOT EXISTS "analysis" (
+-- CreateTable
+CREATE TABLE "analysis" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "platform" TEXT,
@@ -56,8 +48,8 @@ CREATE TABLE IF NOT EXISTS "analysis" (
     CONSTRAINT "analysis_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable - only if it doesn't exist
-CREATE TABLE IF NOT EXISTS "password_reset_token" (
+-- CreateTable
+CREATE TABLE "password_reset_token" (
     "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -67,44 +59,32 @@ CREATE TABLE IF NOT EXISTS "password_reset_token" (
     CONSTRAINT "password_reset_token_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex - only if it doesn't exist
-CREATE UNIQUE INDEX IF NOT EXISTS "user_email_key" ON "user"("email");
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
--- CreateIndex - only if it doesn't exist
-CREATE INDEX IF NOT EXISTS "analysis_userId_idx" ON "analysis"("userId");
+-- CreateIndex
+CREATE INDEX "analysis_userId_idx" ON "analysis"("userId");
 
--- CreateIndex - only if it doesn't exist
-CREATE INDEX IF NOT EXISTS "analysis_createdAt_idx" ON "analysis"("createdAt");
+-- CreateIndex
+CREATE INDEX "analysis_createdAt_idx" ON "analysis"("createdAt");
 
--- CreateIndex - only if it doesn't exist
-CREATE UNIQUE INDEX IF NOT EXISTS "password_reset_token_token_key" ON "password_reset_token"("token");
+-- CreateIndex
+CREATE UNIQUE INDEX "password_reset_token_token_key" ON "password_reset_token"("token");
 
--- CreateIndex - only if it doesn't exist
-CREATE INDEX IF NOT EXISTS "password_reset_token_token_idx" ON "password_reset_token"("token");
+-- CreateIndex
+CREATE INDEX "password_reset_token_token_idx" ON "password_reset_token"("token");
 
--- CreateIndex - only if it doesn't exist
-CREATE INDEX IF NOT EXISTS "password_reset_token_userId_idx" ON "password_reset_token"("userId");
+-- CreateIndex
+CREATE INDEX "password_reset_token_userId_idx" ON "password_reset_token"("userId");
 
--- CreateIndex - only if it doesn't exist
-CREATE INDEX IF NOT EXISTS "password_reset_token_expiresAt_idx" ON "password_reset_token"("expiresAt");
+-- CreateIndex
+CREATE INDEX "password_reset_token_expiresAt_idx" ON "password_reset_token"("expiresAt");
 
--- AddForeignKey - only if it doesn't exist
-DO $$ 
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint 
-        WHERE conname = 'analysis_userId_fkey'
-    ) THEN
-        ALTER TABLE "analysis" ADD CONSTRAINT "analysis_userId_fkey" 
-        FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-    
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint 
-        WHERE conname = 'password_reset_token_userId_fkey'
-    ) THEN
-        ALTER TABLE "password_reset_token" ADD CONSTRAINT "password_reset_token_userId_fkey" 
-        FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-    END IF;
-END $$;
+-- AddForeignKey
+ALTER TABLE "analysis" ADD CONSTRAINT "analysis_userId_fkey" 
+FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "password_reset_token" ADD CONSTRAINT "password_reset_token_userId_fkey" 
+FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
