@@ -94,3 +94,4 @@ npm run dev
 ## ライセンス
 
 このプロジェクトはプライベートプロジェクトです。
+# sns-decision-making
