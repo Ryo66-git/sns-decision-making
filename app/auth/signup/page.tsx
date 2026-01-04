@@ -13,11 +13,23 @@ export default function SignUpPage() {
     setIsLoading(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const result = await registerUser(formData);
+    try {
+      const formData = new FormData(e.currentTarget);
+      const result = await registerUser(formData);
 
-    if (result?.error) {
-      setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        setIsLoading(false);
+      } else {
+        // 成功時はリダイレクトされるが、念のためローディングを解除
+        // redirect()が実行されると、このコードには到達しない可能性がある
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+      }
+    } catch (error: any) {
+      console.error("Registration form error:", error);
+      setError(error?.message || "アカウントの作成に失敗しました。");
       setIsLoading(false);
     }
   }

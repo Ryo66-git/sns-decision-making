@@ -618,46 +618,61 @@ export async function requestPasswordReset(formData: FormData) {
 
 // ユーザー登録
 export async function registerUser(formData: FormData) {
-  const { prisma } = await import("@/lib/prisma");
-  const { sendWelcomeEmail } = await import("@/lib/email");
-  const bcrypt = (await import("bcryptjs")).default;
-  const { redirect } = await import("next/navigation");
-  
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const name = formData.get("name") as string;
-
-  if (!email || !password) {
-    return { error: "メールアドレスとパスワードは必須です" };
-  }
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    return { error: "このメールアドレスは既に登録されています" };
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      name: name || null,
-    },
-  });
-
-  // 登録完了メールを送信（エラーが発生しても登録は完了させる）
   try {
-    await sendWelcomeEmail(user.email, user.name);
-  } catch (error) {
-    console.error("Failed to send welcome email:", error);
-    // メール送信に失敗しても登録は完了させる
-  }
+    const { prisma } = await import("@/lib/prisma");
+    const { sendWelcomeEmail } = await import("@/lib/email");
+    const bcrypt = (await import("bcryptjs")).default;
+    const { redirect } = await import("next/navigation");
+    
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
 
-  redirect("/auth/signin?registered=true");
+    if (!email || !password) {
+      return { error: "メールアドレスとパスワードは必須です" };
+    }
+
+    // データベース接続をテスト
+    try {
+      await prisma.$connect();
+    } catch (dbError) {
+      console.error("Database connection error:", dbError);
+      return { error: "データベースに接続できませんでした。しばらくしてから再度お試しください。" };
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return { error: "このメールアドレスは既に登録されています" };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name: name || null,
+      },
+    });
+
+    // 登録完了メールを送信（エラーが発生しても登録は完了させる）
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (error) {
+      console.error("Failed to send welcome email:", error);
+      // メール送信に失敗しても登録は完了させる
+    }
+
+    redirect("/auth/signin?registered=true");
+  } catch (error: any) {
+    console.error("Registration error:", error);
+    return { 
+      error: error?.message || "アカウントの作成に失敗しました。しばらくしてから再度お試しください。" 
+    };
+  }
 }
 
 // パスワードリセット
